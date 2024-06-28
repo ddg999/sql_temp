@@ -96,23 +96,53 @@ group by d.dept_name
 order by 직원수 asc
 limit 3;
 
-select * from employees;
-
 -- 각 부서의 남자 막내 사원들을 대상으로 워크숍이 예정되어 있습니다. 참석 여부를 조사하기 위해
 -- 대상자를 구분하여 부서번호, 사번, 입사일, 성, 이름을 출력하시오.
-select de.dept_no, e.emp_no, e.hire_date, e.first_name, e.last_name
-from dept_emp de
-left join employees e
-on de.emp_no = e.emp_no
-where e.gender = 'M' and de.to_date = '9999-01-01'
+select de.dept_no, e.emp_no, e.hire_date, e.first_name, e.last_name, max(e.birth_date)
+from employees e
+join dept_emp de
+on e.emp_no = de.emp_no
 group by de.dept_no;
 
--- 5조 
+
+
+
+-- 5조
 -- 문제1. Engineer에서 Senior Engineer로 승진했던 직원의 직원 번호와 first_name last_name을 합친 이름을 출력하시오
 -- 문제2. 근무하는 직원이 50000명 이상인 부서와 그 부서의 직원 수를 출력하세요.
+select e.emp_no as 직원번호, concat(e.first_name, " ", e.last_name) as 이름
+from titles t
+left join employees e
+on t.emp_no = e.emp_no
+left join dept_emp de
+on t.emp_no = de.emp_no
+where t.title = 'Engineer' and t.to_date != '9999-01-01' and de.to_date = '9999-01-01';
 
+select d.dept_name as 부서, count(*) as 직원수
+from departments d
+left join dept_emp de
+on d.dept_no = de.dept_no
+where de.to_date = '9999-01-01'
+group by d.dept_name
+having count(*) >= 50000;
 
 -- 6조 
 -- 마케팅 부서의 직원들을 입사 순서대로 오름차순 정렬하세요.
 -- 출력해야 할 것: 직원의 이름, 고용일, 부서
 -- 근무기간이 30년이상인 Staff 직원들중에서 emp_no낮은순서부터 200명 중에서 가장 오래된 근무년수는?
+
+select e.first_name, e.last_name, e.hire_date, d.dept_name
+from dept_emp de
+join employees e
+on de.emp_no = e.emp_no
+join departments d
+on de.dept_no = d.dept_no
+where de.dept_no = 'd001'
+order by e.hire_date asc;
+
+select title,emp_no ,(year(current_date()) - year(from_date)) as 근무년수 
+from titles
+where to_date = '9999-01-01' and title = 'Staff'
+having 근무년수 >= 30
+order by 근무년수 desc
+limit 200;

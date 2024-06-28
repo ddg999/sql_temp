@@ -70,7 +70,7 @@ select d.dept_name as 부서, count(*) as 고소득직원수
 from salaries s
 left join dept_emp de
 on s.emp_no = de.emp_no
-left join departments d
+left join departments d
 on d.dept_no = de.dept_no
 where s.salary >= 100000 and s.to_date = '9999-01-01' and de.to_date = '9999-01-01'
 group by d.dept_name
@@ -78,13 +78,46 @@ order by 고소득직원수 desc
 limit 3;
 
 -- 24.06.12
--- 2000~2001년에 Senior Engineer가 된 직원들의 평균연봉을 출력하세요
-select 
-from titles t
+-- 재직중이고 1995년 이후 입사한 Senior Engineer 직원이 가장 많은 부서 3개를 출력하세요
+select d.dept_name as 부서, count(*) as 직원수
+from employees e
+left join dept_emp de
+on e.emp_no = de.emp_no
+left join departments d
+on d.dept_no = de.dept_no
+left join titles t
+on e.emp_no = t.emp_no
+where year(e.hire_date) >= 1995 and t.title = 'Senior Engineer'
+and de.to_date ='9999-01-01' and t.to_date = '9999-01-01'
+group by d.dept_name
+order by 직원수 desc
+limit 3;
+
+-- 24.06.13
+-- 마케팅 부서에서 재직중이고, 태어난 년도의 일의자리가 1,2,3 이면 O 아니면 X로 표시하세요
+-- 사번, 이름(성+이름), 생년월일, 체크 로 출력
+select de.emp_no as 사번, concat(e.first_name,' ' ,e.last_name) as 이름, e.birth_date as 생년월일,
+	case when mod(year(birth_date),10) in (1,2,3) then 'O' else 'x' end as 체크
+from employees e
 join dept_emp de
-on t.emp_no = de.emp_no
-where t.title = 'Senior Engineer' and t.to_date = '9999-01-01' and year(t.from_date) between 2000 and 2001;
-group by year(t.from.date);
+on e.emp_no = de.emp_no
+where de.to_date = '9999-01-01' and de.dept_no = 'd001';
+
+-- 24.06.17
+-- 재직중인 인원 수가 가장 많은 부서에서 연봉 120000 이상인 직원수를 출력
+select count(*)
+from (
+select dept_no, count(*) as 인원수
+from dept_emp
+where to_date = '9999-01-01'
+group by dept_no
+order by 인원수 desc
+limit 1) as de_c
+join dept_emp de on de.dept_no = de_c.dept_no
+join salaries s on s.emp_no = de.emp_no
+where de.to_date = '9999-01-01' and s.to_date = '9999-01-01' and s.salary>=120000;
+
+
 
 use employees;
 select * from departments;

@@ -107,7 +107,7 @@ join tb_categories c
 on p.category_id = c.category_id
 where c.parent_id = '5' and c.category_name = '슬랙스';
 
--- '흰색' 상품이 있는 모든 카테고리를 조회하는 쿼리
+-- '퍼블' 상품이 있는 모든 카테고리를 조회하는 쿼리
 select p.*
 from tb_products p
 join tb_categories c
@@ -122,6 +122,8 @@ on p.category_id = c.category_id
 group by p.category_id
 order by max(p.price) desc
 limit 1;
+
+
 
 select * from tb_categories;
 select * from tb_products;
